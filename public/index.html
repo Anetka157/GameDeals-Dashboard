@@ -1,21 +1,37 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-    <meta charset="UTF-8">
-    <title>Herní Radar - Login</title>
-    <style>
-        body { font-family: sans-serif; background: #1a1a1a; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        .container { background: #2a2a2a; padding: 20px; border-radius: 8px; width: 300px; }
-        input { width: 90%; margin-bottom: 10px; padding: 8px; }
-        button { width: 100%; padding: 10px; background: #007bff; border: none; color: white; cursor: pointer; }
-    </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Herní Radar — Přihlášení</title>
+    <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<div class="container">
-    <h2>Herní Radar</h2>
-    <input type="text" placeholder="Uživatelské jméno" id="user">
-    <input type="password" placeholder="Heslo" id="pass">
-    <button onclick="alert('Zatím jen layout - napojení ve 3. týdnu!')">Přihlásit se / Registrovat</button>
+
+<div class="auth-page">
+    <div class="auth-card">
+        <h2>Herní Radar</h2>
+
+        <div class="form-group">
+            <label for="user">Uživatelské jméno</label>
+            <input type="text" id="user" placeholder="tvuj_nick" />
+        </div>
+
+        <div class="form-group">
+            <label for="pass">Heslo</label>
+            <input type="password" id="pass" placeholder="••••••••" />
+        </div>
+
+        <button class="btn btn-primary" style="width:100%"
+                onclick="alert('Napojení na backend proběhne ve 3. týdnu!')">
+            Přihlásit se
+        </button>
+
+        <p style="text-align:center; margin-top:1rem; font-size:0.82rem; color:#a0a0b0;">
+            Nemáš účet? <a href="#">Registrovat se</a>
+        </p>
+    </div>
 </div>
+
 </body>
 </html>

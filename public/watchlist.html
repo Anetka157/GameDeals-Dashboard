@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Herní Radar — Watchlist</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <span class="navbar__logo">Herní Radar</span>
+    <ul class="navbar__links">
+      <li><a href="dashboard.html">Slevy</a></li>
+      <li><a href="watchlist.html" class="active">Watchlist</a></li>
+    </ul>
+    <a href="../../../Desktop/New%20folder/index.html" class="btn btn-outline">Odhlásit</a>
+  </nav>
+
+  <div class="container">
+
+    <div class="section-header">
+      <h2>Watchlist</h2>
+      <button class="btn btn-primary">+ Přidat hru</button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Hra</th>
+            <th>Platforma</th>
+            <th>Cílová cena</th>
+            <th>Aktuální cena</th>
+            <th>Přidáno</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Název hry 1</td>
+            <td><span class="badge badge-steam">Steam</span></td>
+            <td style="color:#00bcd4;">50 Kč</td>
+            <td>89 Kč</td>
+            <td style="color:#a0a0b0;">1. 5. 2025</td>
+            <td><button class="btn btn-outline" style="padding:3px 8px; font-size:0.75rem; color:#e57373; border-color:#e57373;">Odebrat</button></td>
+          </tr>
+          <tr>
+            <td>Název hry 2</td>
+            <td><span class="badge badge-gog">GOG</span></td>
+            <td style="color:#00bcd4;">30 Kč</td>
+            <td style="color:#a0a0b0;">—</td>
+            <td style="color:#a0a0b0;">28. 4. 2025</td>
+            <td><button class="btn btn-outline" style="padding:3px 8px; font-size:0.75rem; color:#e57373; border-color:#e57373;">Odebrat</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <div class="footer">© 2025 Herní Radar</div>
+
+</body>
+</html>
