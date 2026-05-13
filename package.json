@@ -18,6 +18,7 @@
   "homepage": "https://github.com/Anetka157/GameDeals-Dashboard#readme",
   "description": "",
   "dependencies": {
+    "axios": "^1.16.1",
     "express": "^5.2.1",
     "sqlite3": "^6.0.1"
   }

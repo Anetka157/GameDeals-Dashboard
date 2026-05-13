@@ -13,25 +13,25 @@
         <h2>Herní Radar</h2>
 
         <div class="form-group">
-            <label for="user">Uživatelské jméno</label>
-            <input type="text" id="user" placeholder="tvuj_nick" />
+            <label for="username">Uživatelské jméno</label>
+            <input type="text" id="username" placeholder="tvuj_nick" />
         </div>
 
         <div class="form-group">
-            <label for="pass">Heslo</label>
-            <input type="password" id="pass" placeholder="••••••••" />
+            <label for="password">Heslo</label>
+            <input type="password" id="password" placeholder="••••••••" />
         </div>
 
-        <button class="btn btn-primary" style="width:100%"
-                onclick="alert('Napojení na backend proběhne ve 3. týdnu!')">
+        <button class="btn btn-primary" style="width:100%" onclick="prihlaseni()">
             Přihlásit se
         </button>
 
         <p style="text-align:center; margin-top:1rem; font-size:0.82rem; color:#a0a0b0;">
-            Nemáš účet? <a href="#">Registrovat se</a>
+            Nemáš účet? <a href="register.html">Registrovat se</a>
         </p>
     </div>
 </div>
 
+<script src="auth.js"></script>
 </body>
 </html>

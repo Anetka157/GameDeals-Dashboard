@@ -22,6 +22,12 @@
     <h1 style="font-size:1.4rem; margin-bottom:0.25rem;">Aktuální slevy</h1>
     <p style="color:#a0a0b0; font-size:0.88rem; margin-bottom:1.5rem;">Steam · Epic · GOG · Humble Bundle</p>
 
+    <form onsubmit="event.preventDefault(); hledatHry();" class="search-container" style="margin-bottom: 25px; display: flex; gap: 10px;">
+      <input type="text" id="game-input" placeholder="Zadej název hry..."
+             style="flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #1a1a1a; color: white;">
+      <button type="submit" class="btn btn-primary" style="padding: 10px 25px;">Hledat</button>
+    </form>
+
     <div class="filter-bar">
       <button class="filter-chip active">Vše</button>
       <button class="filter-chip">Steam</button>
@@ -30,7 +36,7 @@
       <button class="filter-chip">Humble</button>
     </div>
 
-    <div class="deals-grid">
+    <div class="deals-grid" id="deals-grid">
 
       <div class="card">
         <div class="card__image">náhled</div>
@@ -90,6 +96,8 @@
   </div>
 
   <div class="footer">© 2025 Herní Radar</div>
+
+  <script src="games.js"></script>
 
   <script>
     document.querySelectorAll('.filter-chip').forEach(chip => {
