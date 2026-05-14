@@ -7,8 +7,10 @@ async function hledatHry() {
 
     vystup.innerHTML = "<p>Hledám nejlepší slevy...</p>";
 
+    const userId = localStorage.getItem('userId') || 1;
+
     try {
-        const response = await fetch(`/search-games?title=${encodeURIComponent(query)}`);
+        const response = await fetch(`/search-games?title=${encodeURIComponent(query)}&user_id=${userId}`);
         const hry = await response.json();
 
         vystup.innerHTML = "";
@@ -30,7 +32,7 @@ async function hledatHry() {
                             </span>
                             <button class="btn btn-outline" 
                                     style="padding:3px 8px; font-size:0.75rem;"
-                                    onclick="pridatDoWatchlistu('${hra.external}', ${cenaCZK})">
+                                    onclick="pridatDoWatchlistu('${hra.external}', ${hra.cheapest})">
                                 + WL
                             </button>
                         </div>
@@ -44,11 +46,18 @@ async function hledatHry() {
 }
 
 async function pridatDoWatchlistu(nazev, cena) {
+    const userId = localStorage.getItem('userId');
+
+    if (!userId) {
+        alert("Pro přidání do watchlistu se musíš nejdříve přihlásit!");
+        return;
+    }
+
     const response = await fetch('/watchlist', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            user_id: 1,
+            user_id: userId,
             game_title: nazev,
             target_price: cena
         })

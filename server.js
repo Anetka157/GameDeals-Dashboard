@@ -30,9 +30,9 @@ db.serialize(() => {
 
 app.get('/search-games', async (req, res) => {
     const title = req.query.title;
+    const userId = req.query.user_id || 1;
 
-    db.run("INSERT INTO search_history (query_term, user_id) VALUES (?, ?)", [title, 1]);
-
+    db.run("INSERT INTO search_history (query_term, user_id) VALUES (?, ?)", [title, userId]);
     try {
         const response = await axios.get(`https://www.cheapshark.com/api/1.0/games?title=${title}&limit=12`);
         res.json(response.data);
@@ -42,16 +42,17 @@ app.get('/search-games', async (req, res) => {
 });
 
 app.get('/get-watchlist', (req, res) => {
-    console.log("SERVER: Někdo si prohlíží Watchlist...");
+    const userId = req.query.user_id;
 
-    const sql = `SELECT * FROM watchlist WHERE user_id = 1`;
+    console.log(`SERVER: Prohlížím watchlist pro uživatele ID: ${userId}`);
 
-    db.all(sql, [], (err, rows) => {
+    const sql = `SELECT * FROM watchlist WHERE user_id = ?`;
+
+    db.all(sql, [userId], (err, rows) => {
         if (err) {
             console.error("CHYBA DB:", err.message);
             return res.status(500).json({ error: "Chyba v DB" });
         }
-        console.log(`SERVER: Posílám ${rows.length} her do watchlistu.`);
         res.json(rows);
     });
 });
@@ -68,7 +69,6 @@ app.delete('/delete-watchlist/:id', (req, res) => {
             return res.status(500).json({ error: "Chyba při mazání z databáze" });
         }
 
-        // Zkontrolujeme, jestli se vůbec něco smazalo
         if (this.changes === 0) {
             return res.status(404).json({ error: "Hra s tímto ID nebyla nalezena" });
         }
@@ -98,7 +98,11 @@ app.post('/login', (req, res) => {
         if (err || !row) {
             return res.status(401).json({ error: "Nesprávné jméno nebo heslo." });
         }
-        res.json({ message: "Přihlášení proběhlo úspěšně!", user: row.username });
+        res.json({
+            message: "Přihlášení proběhlo úspěšně!",
+            user: row.username,
+            userId: row.id
+        });
     });
 });
 

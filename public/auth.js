@@ -40,6 +40,9 @@ async function prihlaseni() {
         const data = await response.json();
 
         if (response.ok) {
+            localStorage.setItem('userId', data.userId);
+            localStorage.setItem('userName', data.user);
+
             alert("Vítej, " + data.user + "!");
             window.location.href = "dashboard.html";
         } else {
