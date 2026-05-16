@@ -1,9 +1,18 @@
 async function odeslatRegistraci() {
-    const u = document.getElementById('reg-user').value;
-    const e = document.getElementById('reg-email').value;
+    const u = document.getElementById('reg-user').value.trim();
+    const e = document.getElementById('reg-email').value.trim();
     const p = document.getElementById('reg-pass').value;
+    const p2 = document.getElementById('reg-pass2').value;
+    const err = document.getElementById('pass-error');
 
-    console.log("Pokouším se registrovat:", u, e);
+    // Kontrola shody hesel
+    if (p !== p2) {
+        err.style.display = 'block';
+        return;
+    }
+    err.style.display = 'none';
+
+    if (p.length < 6) return alert("Heslo musí mít alespoň 6 znaků.");
 
     try {
         const response = await fetch('/register', {
@@ -18,17 +27,14 @@ async function odeslatRegistraci() {
         } else {
             alert("Chyba: " + data.error);
         }
-    } catch (err) {
-        console.error("Chyba sítě:", err);
+    } catch {
         alert("Server neodpovídá.");
     }
 }
 
 async function prihlaseni() {
-    const u = document.getElementById('username').value;
+    const u = document.getElementById('username').value.trim();
     const p = document.getElementById('password').value;
-
-    console.log("Pokouším se přihlásit uživatele:", u);
 
     try {
         const response = await fetch('/login', {
@@ -36,20 +42,15 @@ async function prihlaseni() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username: u, password: p })
         });
-
         const data = await response.json();
-
         if (response.ok) {
             localStorage.setItem('userId', data.userId);
             localStorage.setItem('userName', data.user);
-
-            alert("Vítej, " + data.user + "!");
             window.location.href = "dashboard.html";
         } else {
             alert("Chyba: " + data.error);
         }
-    } catch (err) {
-        console.error("Chyba při přihlašování:", err);
+    } catch {
         alert("Server neodpovídá.");
     }
 }

@@ -1,68 +1,280 @@
-async function hledatHry() {
-    const query = document.getElementById('game-input').value;
+const KURZ = 24;
+let aktualniStore = 'all';
+let naseptavaciTimeout = null;
+
+// ── Init ──────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    // Filtr chipy
+    document.querySelectorAll('.filter-chip').forEach(chip => {
+        chip.addEventListener('click', function () {
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            this.classList.add('active');
+            aktualniStore = this.dataset.store || 'all';
+            const query = document.getElementById('game-input').value.trim();
+            if (query) hledatHry();
+        });
+    });
+
+    // Našeptávání
+    const input = document.getElementById('game-input');
+    input.addEventListener('input', () => {
+        clearTimeout(naseptavaciTimeout);
+        const q = input.value.trim();
+        if (q.length < 2) {
+            skrytNaseptavac();
+            return;
+        }
+        naseptavaciTimeout = setTimeout(() => nacistNaseptavani(q), 300);
+    });
+
+    // Zavřít našeptávač při kliknutí mimo
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.search-wrap')) skrytNaseptavac();
+    });
+
+    // Načíst hot deals při startu
+    nacistHotDeals();
+});
+
+// ── Hot deals ─────────────────────────────────────────────
+async function nacistHotDeals() {
     const vystup = document.getElementById('deals-grid');
-    const KURZ = 24;
+    vystup.innerHTML = "<p style='color:#a0a0b0; grid-column:1/-1;'>Načítám top slevy...</p>";
+    try {
+        const response = await fetch('/hot-deals');
+        const hry = await response.json();
+        vystup.innerHTML = "";
+        if (!hry.length) {
+            vystup.innerHTML = "<p style='color:#a0a0b0; grid-column:1/-1;'>Žádné slevy k zobrazení.</p>";
+            return;
+        }
+        hry.forEach(hra => renderKarta(hra, vystup));
+    } catch {
+        vystup.innerHTML = "<p style='color:#a0a0b0; grid-column:1/-1;'>Zadej název hry a klikni Hledat.</p>";
+    }
+}
 
-    if (!query) return alert("Napiš název hry!");
+// ── Hledání ───────────────────────────────────────────────
+async function hledatHry() {
+    const query = document.getElementById('game-input').value.trim();
+    const vystup = document.getElementById('deals-grid');
+    skrytNaseptavac();
+    if (!query) return;
 
-    vystup.innerHTML = "<p>Hledám nejlepší slevy...</p>";
-
+    vystup.innerHTML = "<p style='color:#a0a0b0; grid-column:1/-1;'>Hledám slevy...</p>";
     const userId = localStorage.getItem('userId') || 1;
 
     try {
-        const response = await fetch(`/search-games?title=${encodeURIComponent(query)}&user_id=${userId}`);
+        const response = await fetch(`/search-games?title=${encodeURIComponent(query)}&store=${aktualniStore}&user_id=${userId}`);
         const hry = await response.json();
-
         vystup.innerHTML = "";
+        if (!hry.length) {
+            vystup.innerHTML = "<p style='color:#a0a0b0; grid-column:1/-1;'>Žádné výsledky nenalezeny.</p>";
+            return;
+        }
+        hry.forEach(hra => renderKarta(hra, vystup));
+    } catch {
+        vystup.innerHTML = "<p style='color:#e57373; grid-column:1/-1;'>Chyba při komunikaci se serverem.</p>";
+    }
+}
 
-        hry.forEach(hra => {
+// ── Renderování karty ─────────────────────────────────────
+function renderKarta(hra, kontejner) {
+    const cenaCZK = Math.round(hra.salePrice * KURZ);
+    const origCZK = Math.round(hra.normalPrice * KURZ);
+    const sleva = Math.round(hra.savings);
 
-            const cenaCZK = Math.round(hra.cheapest * KURZ);
+    const storeClass = { Steam: 'badge-steam', GOG: 'badge-gog', Epic: 'badge-epic', Humble: 'badge-humble' }[hra.storeName] || 'badge-discount';
 
-            vystup.innerHTML += `
-                <div class="card">
-                    <div class="card__image">
-                        <img src="${hra.thumb}" style="width:100%; border-radius:8px 8px 0 0;">
-                    </div>
-                    <div class="card__body">
-                        <div class="card__title">${hra.external}</div>
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
-                            <span>
-                                <span class="card__price">${cenaCZK} Kč</span>
-                            </span>
-                            <button class="btn btn-outline" 
-                                    style="padding:3px 8px; font-size:0.75rem;"
-                                    onclick="pridatDoWatchlistu('${hra.external}', ${hra.cheapest})">
-                                + WL
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
+    const karta = document.createElement('div');
+    karta.className = 'card';
+
+    const nazevEsc = hra.title.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+
+    karta.innerHTML = `
+        <div style="position:relative; cursor:pointer;" onclick="otevritDetail('${hra.dealID}', '${nazevEsc}', ${hra.salePrice})">
+            <img src="${hra.thumb}" class="card__image" alt="${hra.title}">
+            ${sleva > 0 ? `<span class="badge badge-discount" style="position:absolute; top:8px; right:8px;">-${sleva}%</span>` : ''}
+        </div>
+        <div class="card__body">
+            <div style="margin-bottom:5px;">
+                <span class="badge ${storeClass}">${hra.storeName}</span>
+            </div>
+            <div class="card__title" title="${hra.title}">${hra.title}</div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+                <span>
+                    <span class="card__price">${cenaCZK} Kč</span>
+                    ${origCZK > cenaCZK ? `<span class="card__price-old">${origCZK} Kč</span>` : ''}
+                </span>
+                <button class="btn-wl" title="Přidat do watchlistu"
+                        data-title="${nazevEsc}" data-price="${hra.salePrice}"
+                        onclick="event.stopPropagation(); handleWl(this)">♡</button>
+            </div>
+        </div>
+    `;
+    kontejner.appendChild(karta);
+}
+
+// ── Watchlist — opravený event kontext ────────────────────
+async function handleWl(btn) {
+    const nazev = btn.dataset.title;
+    const cena = btn.dataset.price;
+    const userId = localStorage.getItem('userId');
+
+    if (!userId) return alert("Pro přidání do watchlistu se musíš přihlásit!");
+
+    try {
+        const response = await fetch('/watchlist', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: userId, game_title: nazev, target_price: parseFloat(cena) })
         });
-    } catch (err) {
-        vystup.innerHTML = "<p>Chyba při komunikaci se serverem.</p>";
+        const data = await response.json();
+        if (response.ok) {
+            btn.textContent = '♥';
+            btn.style.color = '#e57373';
+            setTimeout(() => { btn.textContent = '♡'; btn.style.color = ''; }, 2000);
+        } else {
+            alert("Chyba: " + data.error);
+        }
+    } catch {
+        alert("Chyba při přidávání do watchlistu.");
     }
 }
 
 async function pridatDoWatchlistu(nazev, cena) {
     const userId = localStorage.getItem('userId');
-
-    if (!userId) {
-        alert("Pro přidání do watchlistu se musíš nejdříve přihlásit!");
-        return;
-    }
-
-    const response = await fetch('/watchlist', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            user_id: userId,
-            game_title: nazev,
-            target_price: cena
-        })
-    });
-
-    const data = await response.json();
-    alert(data.message);
+    if (!userId) return alert("Pro přidání do watchlistu se musíš přihlásit!");
+    try {
+        const response = await fetch('/watchlist', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: userId, game_title: nazev, target_price: parseFloat(cena) || 0 })
+        });
+        const data = await response.json();
+        if (response.ok) {
+            zavritModal();
+            // Krátká zpráva
+            const toast = document.createElement('div');
+            toast.textContent = '♥ Přidáno do watchlistu';
+            toast.style.cssText = 'position:fixed;bottom:1.5rem;right:1.5rem;background:#1a1d27;border:1px solid #2a2d3a;border-left:3px solid #00bcd4;padding:0.75rem 1rem;border-radius:8px;font-size:0.88rem;z-index:9999;';
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2500);
+        } else {
+            alert("Chyba: " + data.error);
+        }
+    } catch { alert("Chyba při přidávání."); }
 }
+
+// ── Našeptávání ───────────────────────────────────────────
+async function nacistNaseptavani(q) {
+    try {
+        const response = await fetch(`/suggest?q=${encodeURIComponent(q)}`);
+        const names = await response.json();
+        zobrazitNaseptavac(names);
+    } catch { skrytNaseptavac(); }
+}
+
+function zobrazitNaseptavac(names) {
+    let box = document.getElementById('naseptavac');
+    if (!box) {
+        box = document.createElement('div');
+        box.id = 'naseptavac';
+        box.style.cssText = 'position:absolute; top:100%; left:0; right:0; background:#1a1d27; border:1px solid #2a2d3a; border-top:none; border-radius:0 0 8px 8px; z-index:100; overflow:hidden;';
+        document.querySelector('.search-wrap').appendChild(box);
+    }
+    if (!names.length) { skrytNaseptavac(); return; }
+    box.innerHTML = names.map(n => `
+        <div class="naseptavac-item" onclick="vybratNaseptavani('${n.replace(/'/g, "\\'")}')"
+             style="padding:0.6rem 1rem; cursor:pointer; font-size:0.9rem; border-bottom:1px solid #2a2d3a;">
+            ${n}
+        </div>
+    `).join('');
+    box.style.display = 'block';
+}
+
+function vybratNaseptavani(nazev) {
+    document.getElementById('game-input').value = nazev;
+    skrytNaseptavac();
+    hledatHry();
+}
+
+function skrytNaseptavac() {
+    const box = document.getElementById('naseptavac');
+    if (box) box.style.display = 'none';
+}
+
+// ── Detail hry ────────────────────────────────────────────
+async function otevritDetail(dealID, title, salePrice) {
+    const modal = document.getElementById('modal');
+    const modalBody = document.getElementById('modal-body');
+    modal.style.display = 'flex';
+    modalBody.innerHTML = `<p style="color:#a0a0b0; text-align:center; padding:2rem;">Načítám detail...</p>`;
+
+    try {
+        const response = await fetch(`/game-detail/${dealID}`);
+        const data = await response.json();
+
+        if (data.error || !data.gameInfo) {
+            // Záložní zobrazení z dat co už máme
+            const cenaCZK = Math.round(parseFloat(salePrice) * KURZ);
+            modalBody.innerHTML = `
+                <h2 style="font-size:1.1rem; margin-bottom:1rem;">${title}</h2>
+                <p style="color:#a0a0b0; font-size:0.85rem; margin-bottom:1rem;">Detail není dostupný pro tuto hru.</p>
+                <p style="font-size:0.82rem; color:#a0a0b0; margin-bottom:0.25rem;">Cena</p>
+                <p style="font-size:1.4rem; font-weight:600; color:#00bcd4; margin-bottom:1.25rem;">${cenaCZK} Kč</p>
+                <button class="btn btn-primary" style="width:100%"
+                    onclick="pridatDoWatchlistu('${title.replace(/'/g, "\\'")}', ${salePrice})">
+                    ♡ Přidat do watchlistu
+                </button>
+            `;
+            return;
+        }
+
+        const game = data.gameInfo;
+        const cenaCZK = Math.round(parseFloat(game.salePrice) * KURZ);
+        const origCZK = Math.round(parseFloat(game.retailPrice) * KURZ);
+        const deals = data.cheaperStores || [];
+
+        modalBody.innerHTML = `
+            <div style="display:flex; gap:1.25rem; flex-wrap:wrap;">
+                ${game.thumb ? `<img src="${game.thumb}" style="width:190px; border-radius:8px; object-fit:cover; flex-shrink:0; align-self:flex-start;">` : ''}
+                <div style="flex:1; min-width:180px;">
+                    <h2 style="font-size:1.05rem; margin-bottom:0.6rem;">${title}</h2>
+                    <div style="display:flex; gap:0.75rem; flex-wrap:wrap; margin-bottom:0.75rem;">
+                        ${game.metacriticScore > 0 ? `<span style="font-size:0.8rem; background:#4caf5020; color:#4caf50; padding:2px 8px; border-radius:4px;">Metacritic ${game.metacriticScore}</span>` : ''}
+                        ${game.steamRatingText ? `<span style="font-size:0.8rem; background:#66c0f420; color:#66c0f4; padding:2px 8px; border-radius:4px;">${game.steamRatingText} (${game.steamRatingPercent}%)</span>` : ''}
+                    </div>
+                    <p style="font-size:0.78rem; color:#a0a0b0; margin-bottom:0.25rem;">Aktuální cena</p>
+                    <p style="margin-bottom:1rem;">
+                        <span style="font-size:1.4rem; font-weight:600; color:#00bcd4;">${cenaCZK} Kč</span>
+                        ${origCZK > cenaCZK ? `<span style="font-size:0.85rem; color:#555; text-decoration:line-through; margin-left:8px;">${origCZK} Kč</span>` : ''}
+                    </p>
+                    ${deals.length > 0 ? `
+                        <p style="font-size:0.75rem; color:#a0a0b0; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.4rem;">Také v jiných obchodech</p>
+                        ${deals.map(d => `
+                            <div style="display:flex; justify-content:space-between; font-size:0.82rem; padding:5px 0; border-bottom:1px solid #2a2d3a;">
+                                <span style="color:#a0a0b0;">${d.storeName || 'Jiný'}</span>
+                                <span style="color:#00bcd4;">${Math.round(parseFloat(d.salePrice) * KURZ)} Kč</span>
+                            </div>
+                        `).join('')}
+                    ` : ''}
+                    <button class="btn btn-primary" style="margin-top:1.25rem; width:100%;"
+                        onclick="pridatDoWatchlistu('${title.replace(/'/g, "\\'")}', ${game.salePrice})">
+                        ♡ Přidat do watchlistu
+                    </button>
+                </div>
+            </div>
+        `;
+    } catch {
+        modalBody.innerHTML = `<p style="color:#e57373; text-align:center; padding:2rem;">Nepodařilo se načíst detail.</p>`;
+    }
+}
+
+function zavritModal() {
+    document.getElementById('modal').style.display = 'none';
+}
+
+window.addEventListener('click', (e) => {
+    if (e.target === document.getElementById('modal')) zavritModal();
+});

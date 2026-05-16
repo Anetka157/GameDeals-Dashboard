@@ -8,105 +8,61 @@
 </head>
 <body>
 
-  <nav class="navbar">
-    <span class="navbar__logo">Herní Radar</span>
-    <ul class="navbar__links">
-      <li><a href="dashboard.html" class="active">Slevy</a></li>
-      <li><a href="watchlist.html">Watchlist</a></li>
-    </ul>
-    <a href="index.html" class="btn btn-outline">Odhlásit</a>
-  </nav>
+<nav class="navbar">
+  <span class="navbar__logo">Herní Radar</span>
+  <ul class="navbar__links">
+    <li><a href="dashboard.html" class="active">Slevy</a></li>
+    <li><a href="watchlist.html">Watchlist</a></li>
+  </ul>
+  <div style="display:flex; align-items:center; gap:0.75rem;">
+    <span id="nav-user" style="font-size:0.82rem; color:#a0a0b0;"></span>
+    <a href="index.html" class="btn btn-outline" onclick="odhlasit()">Odhlásit</a>
+  </div>
+</nav>
 
-  <div class="container">
+<div class="container">
+  <h1 style="font-size:1.4rem; margin-bottom:0.25rem;">Aktuální slevy</h1>
+  <p style="color:#a0a0b0; font-size:0.88rem; margin-bottom:1.5rem;">Steam · Epic · GOG · Humble Bundle</p>
 
-    <h1 style="font-size:1.4rem; margin-bottom:0.25rem;">Aktuální slevy</h1>
-    <p style="color:#a0a0b0; font-size:0.88rem; margin-bottom:1.5rem;">Steam · Epic · GOG · Humble Bundle</p>
-
-    <form onsubmit="event.preventDefault(); hledatHry();" class="search-container" style="margin-bottom: 25px; display: flex; gap: 10px;">
-      <input type="text" id="game-input" placeholder="Zadej název hry..."
-             style="flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #1a1a1a; color: white;">
-      <button type="submit" class="btn btn-primary" style="padding: 10px 25px;">Hledat</button>
-    </form>
-
-    <div class="filter-bar">
-      <button class="filter-chip active">Vše</button>
-      <button class="filter-chip">Steam</button>
-      <button class="filter-chip">Epic</button>
-      <button class="filter-chip">GOG</button>
-      <button class="filter-chip">Humble</button>
+  <form onsubmit="event.preventDefault(); hledatHry();" style="margin-bottom:1.25rem; display:flex; gap:10px;">
+    <div class="search-wrap" style="flex:1; position:relative;">
+      <input type="text" id="game-input" placeholder="Zadej název hry..." style="width:100%;" autocomplete="off" />
     </div>
+    <button type="submit" class="btn btn-primary">Hledat</button>
+  </form>
 
-    <div class="deals-grid" id="deals-grid">
-
-      <div class="card">
-        <div class="card__image">náhled</div>
-        <div class="card__body">
-          <div style="margin-bottom:6px;">
-            <span class="badge badge-steam">Steam</span>
-            <span class="badge badge-discount" style="margin-left:4px;">-85%</span>
-          </div>
-          <div class="card__title">Název hry</div>
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
-            <span>
-              <span class="card__price">29 Kč</span>
-              <span class="card__price-old">199 Kč</span>
-            </span>
-            <button class="btn btn-outline" style="padding:3px 8px; font-size:0.75rem;">+ WL</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card__image">náhled</div>
-        <div class="card__body">
-          <div style="margin-bottom:6px;">
-            <span class="badge badge-epic">Epic</span>
-            <span class="badge badge-free" style="margin-left:4px;">Zdarma</span>
-          </div>
-          <div class="card__title">Název hry</div>
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
-            <span>
-              <span class="card__price">0 Kč</span>
-              <span class="card__price-old">599 Kč</span>
-            </span>
-            <button class="btn btn-outline" style="padding:3px 8px; font-size:0.75rem;">+ WL</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card__image">náhled</div>
-        <div class="card__body">
-          <div style="margin-bottom:6px;">
-            <span class="badge badge-gog">GOG</span>
-            <span class="badge badge-discount" style="margin-left:4px;">-60%</span>
-          </div>
-          <div class="card__title">Název hry</div>
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
-            <span>
-              <span class="card__price">79 Kč</span>
-              <span class="card__price-old">199 Kč</span>
-            </span>
-            <button class="btn btn-outline" style="padding:3px 8px; font-size:0.75rem;">+ WL</button>
-          </div>
-        </div>
-      </div>
-
-    </div>
+  <div class="filter-bar">
+    <button class="filter-chip active" data-store="all">Vše</button>
+    <button class="filter-chip" data-store="steam">Steam</button>
+    <button class="filter-chip" data-store="epic">Epic</button>
+    <button class="filter-chip" data-store="gog">GOG</button>
+    <button class="filter-chip" data-store="humble">Humble</button>
   </div>
 
-  <div class="footer">© 2025 Herní Radar</div>
+  <div class="deals-grid" id="deals-grid">
+    <p style="color:#a0a0b0; font-size:0.88rem; grid-column:1/-1; margin-top:0.5rem;">Načítám top slevy...</p>
+  </div>
+</div>
 
-  <script src="games.js"></script>
+<!-- Modal -->
+<div id="modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center; padding:1rem;">
+  <div style="background:#1a1d27; border:1px solid #2a2d3a; border-radius:12px; max-width:600px; width:100%; padding:1.5rem; position:relative; max-height:90vh; overflow-y:auto;">
+    <button onclick="zavritModal()" style="position:absolute; top:12px; right:14px; background:none; border:none; color:#a0a0b0; font-size:1.2rem; cursor:pointer;">✕</button>
+    <div id="modal-body"></div>
+  </div>
+</div>
 
-  <script>
-    document.querySelectorAll('.filter-chip').forEach(chip => {
-      chip.addEventListener('click', function() {
-        document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-        this.classList.add('active');
-      });
-    });
-  </script>
+<div class="footer">© 2025 Herní Radar</div>
+
+<script src="games.js"></script>
+<script>
+  const userName = localStorage.getItem('userName');
+  if (userName) document.getElementById('nav-user').textContent = userName;
+  function odhlasit() {
+    localStorage.removeItem('userId');
+    localStorage.removeItem('userName');
+  }
+</script>
 
 </body>
 </html>

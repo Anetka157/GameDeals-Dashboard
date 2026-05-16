@@ -1,30 +1,46 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Herní Radar — Registrace</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 <div class="auth-page">
     <div class="auth-card">
         <h2>Nová registrace</h2>
+
         <div class="form-group">
             <label>Uživatelské jméno</label>
-            <input type="text" id="reg-user" placeholder="tvůj nick">
+            <input type="text" id="reg-user" placeholder="tvůj nick" />
         </div>
+
         <div class="form-group">
             <label>Email</label>
-            <input type="email" id="reg-email" placeholder="email@seznam.cz">
+            <input type="email" id="reg-email" placeholder="email@seznam.cz" />
         </div>
+
         <div class="form-group">
             <label>Heslo</label>
-            <input type="password" id="reg-pass" placeholder="••••••••">
+            <input type="password" id="reg-pass" placeholder="••••••••" />
         </div>
+
+        <div class="form-group">
+            <label>Heslo znovu</label>
+            <input type="password" id="reg-pass2" placeholder="••••••••" />
+            <span id="pass-error" style="font-size:0.78rem; color:#e57373; display:none; margin-top:4px;">
+        Hesla se neshodují.
+      </span>
+        </div>
+
         <button class="btn btn-primary" style="width:100%" onclick="odeslatRegistraci()">
             Vytvořit účet
         </button>
-        <p style="text-align:center; margin-top:1rem;"><a href="index.html">Zpět na přihlášení</a></p>
+
+        <p style="text-align:center; margin-top:1rem; font-size:0.82rem;">
+            <a href="index.html">Zpět na přihlášení</a>
+        </p>
     </div>
 </div>
 <script src="auth.js"></script>

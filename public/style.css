@@ -1,10 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
   font-family: 'Inter', sans-serif;
@@ -13,14 +9,8 @@ body {
   min-height: 100vh;
 }
 
-a {
-  color: #00bcd4;
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
-}
+a { color: #00bcd4; text-decoration: none; }
+a:hover { text-decoration: underline; }
 
 /* ── Navbar ── */
 .navbar {
@@ -32,36 +22,14 @@ a:hover {
   align-items: center;
   justify-content: space-between;
 }
-
-.navbar__logo {
-  font-weight: 600;
-  font-size: 1rem;
-  color: #00bcd4;
-}
-
-.navbar__links {
-  display: flex;
-  gap: 1.5rem;
-  list-style: none;
-}
-
-.navbar__links a {
-  color: #a0a0b0;
-  font-size: 0.9rem;
-}
-
+.navbar__logo { font-weight: 600; font-size: 1rem; color: #00bcd4; }
+.navbar__links { display: flex; gap: 1.5rem; list-style: none; }
+.navbar__links a { color: #a0a0b0; font-size: 0.9rem; }
 .navbar__links a:hover,
-.navbar__links a.active {
-  color: #00bcd4;
-  text-decoration: none;
-}
+.navbar__links a.active { color: #00bcd4; text-decoration: none; }
 
 /* ── Container ── */
-.container {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 2rem 1.5rem;
-}
+.container { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
 
 /* ── Buttons ── */
 .btn {
@@ -72,30 +40,26 @@ a:hover {
   font-weight: 500;
   border: 1px solid transparent;
   cursor: pointer;
+  font-family: inherit;
 }
+.btn-primary { background: #00bcd4; color: #000; border-color: #00bcd4; }
+.btn-primary:hover { background: #00acc1; text-decoration: none; }
+.btn-outline { background: transparent; color: #a0a0b0; border-color: #2a2d3a; }
+.btn-outline:hover { color: #e0e0e0; border-color: #a0a0b0; text-decoration: none; }
 
-.btn-primary {
-  background: #00bcd4;
-  color: #000;
-  border-color: #00bcd4;
-}
-
-.btn-primary:hover {
-  background: #00acc1;
-  text-decoration: none;
-}
-
-.btn-outline {
-  background: transparent;
+/* ── Srdíčko ── */
+.btn-wl {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
   color: #a0a0b0;
-  border-color: #2a2d3a;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: color 0.15s, transform 0.15s;
+  line-height: 1;
 }
-
-.btn-outline:hover {
-  color: #e0e0e0;
-  border-color: #a0a0b0;
-  text-decoration: none;
-}
+.btn-wl:hover { color: #e57373; transform: scale(1.2); }
 
 /* ── Forms ── */
 input, select {
@@ -109,25 +73,17 @@ input, select {
   outline: none;
   width: 100%;
 }
+input:focus, select:focus { border-color: #00bcd4; }
+input::placeholder { color: #555; }
+label { display: block; font-size: 0.8rem; color: #a0a0b0; margin-bottom: 5px; }
+.form-group { margin-bottom: 1rem; }
 
-input:focus, select:focus {
-  border-color: #00bcd4;
-}
+/* ── Našeptávač ── */
+.naseptavac-item:hover { background: #2a2d3a; color: #00bcd4; }
+.naseptavac-item:last-child { border-bottom: none !important; }
 
-input::placeholder {
-  color: #555;
-}
-
-label {
-  display: block;
-  font-size: 0.8rem;
-  color: #a0a0b0;
-  margin-bottom: 5px;
-}
-
-.form-group {
-  margin-bottom: 1rem;
-}
+/* ── Klikatelný název hry v tabulce ── */
+.hra-link:hover { color: #00bcd4; text-decoration: underline; }
 
 /* ── Cards ── */
 .card {
@@ -135,16 +91,10 @@ label {
   border: 1px solid #2a2d3a;
   border-radius: 10px;
   overflow: hidden;
+  transition: border-color 0.15s, transform 0.15s;
 }
-
-.card:hover {
-  border-color: #00bcd4;
-}
-
-.card__body {
-  padding: 0.9rem;
-}
-
+.card:hover { border-color: #00bcd4; transform: translateY(-2px); }
+.card__body { padding: 0.9rem; }
 .card__title {
   font-size: 0.9rem;
   font-weight: 500;
@@ -153,32 +103,11 @@ label {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.card__price { color: #00bcd4; font-weight: 600; }
+.card__price-old { color: #555; text-decoration: line-through; font-size: 0.82rem; margin-left: 6px; }
+.card__image { display: block; width: 100%; aspect-ratio: 16/9; object-fit: cover; background: #12141c; }
 
-.card__price {
-  color: #00bcd4;
-  font-weight: 600;
-}
-
-.card__price-old {
-  color: #555;
-  text-decoration: line-through;
-  font-size: 0.82rem;
-  margin-left: 6px;
-}
-
-.card__image {
-  width: 100%;
-  aspect-ratio: 16/9;
-  object-fit: cover;
-  background: #12141c;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #333;
-  font-size: 0.78rem;
-}
-
-/* ── Deals grid ── */
+/* ── Grid ── */
 .deals-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -187,28 +116,16 @@ label {
 }
 
 /* ── Badges ── */
-.badge {
-  display: inline-block;
-  font-size: 0.72rem;
-  font-weight: 600;
-  padding: 2px 7px;
-  border-radius: 4px;
-}
-
+.badge { display: inline-block; font-size: 0.72rem; font-weight: 600; padding: 2px 7px; border-radius: 4px; }
 .badge-discount { background: #00bcd420; color: #00bcd4; }
 .badge-free     { background: #4caf5020; color: #4caf50; }
 .badge-steam    { background: #66c0f420; color: #66c0f4; }
 .badge-epic     { background: #ffffff15; color: #aaa; }
 .badge-gog      { background: #b06aff20; color: #b06aff; }
+.badge-humble   { background: #f4752020; color: #f47520; }
 
 /* ── Filter bar ── */
-.filter-bar {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  margin: 1rem 0;
-}
-
+.filter-bar { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 1rem 0; }
 .filter-chip {
   padding: 0.35rem 0.85rem;
   border-radius: 999px;
@@ -217,40 +134,18 @@ label {
   color: #a0a0b0;
   font-size: 0.82rem;
   cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
 }
-
-.filter-chip:hover,
-.filter-chip.active {
-  border-color: #00bcd4;
-  color: #00bcd4;
-}
+.filter-chip:hover, .filter-chip.active { border-color: #00bcd4; color: #00bcd4; }
 
 /* ── Section header ── */
-.section-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1rem;
-}
-
-.section-header h2 {
-  font-size: 1.1rem;
-  font-weight: 600;
-}
+.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+.section-header h2 { font-size: 1.1rem; font-weight: 600; }
 
 /* ── Table ── */
-.table-wrap {
-  border: 1px solid #2a2d3a;
-  border-radius: 10px;
-  overflow-x: auto;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.88rem;
-}
-
+.table-wrap { border: 1px solid #2a2d3a; border-radius: 10px; overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
 thead th {
   padding: 0.75rem 1rem;
   text-align: left;
@@ -261,52 +156,17 @@ thead th {
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
+tbody td { padding: 0.75rem 1rem; border-bottom: 1px solid #1e2130; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: #1e2130; }
 
-tbody td {
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid #1e2130;
-}
-
-tbody tr:last-child td {
-  border-bottom: none;
-}
-
-tbody tr:hover {
-  background: #1e2130;
-}
-
-/* ── Auth page ── */
-.auth-page {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-}
-
-.auth-card {
-  background: #1a1d27;
-  border: 1px solid #2a2d3a;
-  border-radius: 10px;
-  padding: 2rem;
-  width: 100%;
-  max-width: 360px;
-}
-
-.auth-card h2 {
-  font-size: 1.2rem;
-  margin-bottom: 1.5rem;
-  text-align: center;
-}
+/* ── Auth ── */
+.auth-page { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+.auth-card { background: #1a1d27; border: 1px solid #2a2d3a; border-radius: 10px; padding: 2rem; width: 100%; max-width: 360px; }
+.auth-card h2 { font-size: 1.2rem; margin-bottom: 1.5rem; text-align: center; }
 
 /* ── Footer ── */
-.footer {
-  border-top: 1px solid #2a2d3a;
-  padding: 1.5rem;
-  text-align: center;
-  font-size: 0.8rem;
-  color: #555;
-  margin-top: 3rem;
-}
+.footer { border-top: 1px solid #2a2d3a; padding: 1.5rem; text-align: center; font-size: 0.8rem; color: #555; margin-top: 3rem; }
 
 /* ── Responsive ── */
 @media (max-width: 600px) {

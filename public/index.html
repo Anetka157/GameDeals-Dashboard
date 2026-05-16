@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
 <div class="auth-page">
     <div class="auth-card">
         <h2>Herní Radar</h2>
@@ -22,16 +21,17 @@
             <input type="password" id="password" placeholder="••••••••" />
         </div>
 
-        <button class="btn btn-primary" style="width:100%" onclick="prihlaseni()">
-            Přihlásit se
-        </button>
+        <button class="btn btn-primary" style="width:100%" onclick="prihlaseni()">Přihlásit se</button>
 
-        <p style="text-align:center; margin-top:1rem; font-size:0.82rem; color:#a0a0b0;">
+        <p style="text-align:center; margin-top:0.75rem; font-size:0.82rem;">
+            <a href="forgot-password.html">Zapomenuté heslo?</a>
+        </p>
+
+        <p style="text-align:center; margin-top:0.5rem; font-size:0.82rem; color:#a0a0b0;">
             Nemáš účet? <a href="register.html">Registrovat se</a>
         </p>
     </div>
 </div>
-
 <script src="auth.js"></script>
 </body>
 </html>

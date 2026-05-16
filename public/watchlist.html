@@ -8,59 +8,66 @@
 </head>
 <body>
 
-  <nav class="navbar">
-    <span class="navbar__logo">Herní Radar</span>
-    <ul class="navbar__links">
-      <li><a href="dashboard.html">Slevy</a></li>
-      <li><a href="watchlist.html" class="active">Watchlist</a></li>
-    </ul>
-    <a href="index.html" class="btn btn-outline">Odhlásit</a>
-  </nav>
+<nav class="navbar">
+  <span class="navbar__logo">Herní Radar</span>
+  <ul class="navbar__links">
+    <li><a href="dashboard.html">Slevy</a></li>
+    <li><a href="watchlist.html" class="active">Watchlist</a></li>
+  </ul>
+  <div style="display:flex; align-items:center; gap:0.75rem;">
+    <span id="nav-user" style="font-size:0.82rem; color:#a0a0b0;"></span>
+    <a href="index.html" class="btn btn-outline" onclick="odhlasit()">Odhlásit</a>
+  </div>
+</nav>
 
-  <div class="container">
-
-    <div class="section-header">
-      <h2>Watchlist</h2>
-      <button class="btn btn-primary">+ Přidat hru</button>
-    </div>
-
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Hra</th>
-            <th>Platforma</th>
-            <th>Cílová cena</th>
-            <th>Aktuální cena</th>
-            <th>Přidáno</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="watchlist-grid">
-          <tr>
-            <td>Název hry 1</td>
-            <td><span class="badge badge-steam">Steam</span></td>
-            <td style="color:#00bcd4;">50 Kč</td>
-            <td>89 Kč</td>
-            <td style="color:#a0a0b0;">1. 5. 2025</td>
-            <td><button class="btn btn-outline" style="padding:3px 8px; font-size:0.75rem; color:#e57373; border-color:#e57373;">Odebrat</button></td>
-          </tr>
-          <tr>
-            <td>Název hry 2</td>
-            <td><span class="badge badge-gog">GOG</span></td>
-            <td style="color:#00bcd4;">30 Kč</td>
-            <td style="color:#a0a0b0;">—</td>
-            <td style="color:#a0a0b0;">28. 4. 2025</td>
-            <td><button class="btn btn-outline" style="padding:3px 8px; font-size:0.75rem; color:#e57373; border-color:#e57373;">Odebrat</button></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
+<div class="container">
+  <div class="section-header">
+    <h2>Watchlist</h2>
   </div>
 
-  <div class="footer">© 2025 Herní Radar</div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+      <tr>
+        <th>Hra</th>
+        <th>Platforma</th>
+        <th>Cena při přidání</th>
+        <th>Aktuální cena</th>
+        <th>Přidáno</th>
+        <th></th>
+      </tr>
+      </thead>
+      <tbody id="watchlist-grid">
+      <tr>
+        <td colspan="6" style="color:#a0a0b0; text-align:center; padding:1.5rem;">Načítání...</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal (stejný jako na dashboardu) -->
+<div id="modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center; padding:1rem;">
+  <div style="background:#1a1d27; border:1px solid #2a2d3a; border-radius:12px; max-width:600px; width:100%; padding:1.5rem; position:relative; max-height:90vh; overflow-y:auto;">
+    <button onclick="zavritModal()" style="position:absolute; top:12px; right:14px; background:none; border:none; color:#a0a0b0; font-size:1.2rem; cursor:pointer;">✕</button>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<div class="footer">© 2025 Herní Radar</div>
 
 <script src="watchlist.js"></script>
+<script>
+  const userName = localStorage.getItem('userName');
+  if (userName) document.getElementById('nav-user').textContent = userName;
+  function odhlasit() {
+    localStorage.removeItem('userId');
+    localStorage.removeItem('userName');
+  }
+  window.addEventListener('click', (e) => {
+    if (e.target === document.getElementById('modal')) zavritModal();
+  });
+</script>
+
 </body>
 </html>
