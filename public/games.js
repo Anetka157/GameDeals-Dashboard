@@ -10,8 +10,14 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
             this.classList.add('active');
             aktualniStore = this.dataset.store || 'all';
+
             const query = document.getElementById('game-input').value.trim();
-            if (query) hledatHry();
+            if (query) {
+                hledatHry();
+            } else {
+                // OPRAVA: Pokud je vyhledávací pole prázdné, aplikujeme filtr na úvodní slevy
+                nacistHotDeals();
+            }
         });
     });
 
@@ -39,18 +45,50 @@ document.addEventListener('DOMContentLoaded', () => {
 // ── Hot deals ─────────────────────────────────────────────
 async function nacistHotDeals() {
     const vystup = document.getElementById('deals-grid');
-    vystup.innerHTML = "<p style='color:#a0a0b0; grid-column:1/-1;'>Načítám top slevy...</p>";
+    vystup.innerHTML = "<p style='color:#a0a0b0; grid-column:1/-1;'>Načítám ty nejlepší slevy...</p>";
+
     try {
-        const response = await fetch('/hot-deals');
-        const hry = await response.json();
+        // Převod názvů z tvých tlačítek na ID obchodů v CheapShark databázi
+        const storeMap = { steam: "1", gog: "7", humble: "11", epic: "25" };
+
+        // Pokud je vybráno "Vše", vezmeme všechny 4 hlavní obchody, jinak jen ten kliknutý
+        const storeIds = aktualniStore === 'all' ? "1,7,11,25" : storeMap[aktualniStore.toLowerCase()];
+
+        // Magie! Stahujeme rovnou z API:
+        // metacritic=75 -> Ukáže jen hry s vysokým hodnocením (žádné neznámé hovadiny)
+        // sortBy=Deal Rating -> Seřadí od nejvýhodnější slevy
+        // pageSize=30 -> Načte vždy rovných 30 her pro daný obchod
+        const url = `https://www.cheapshark.com/api/1.0/deals?storeID=${storeIds}&sortBy=Deal Rating&metacritic=75&pageSize=30`;
+
+        const response = await fetch(url);
+        const rawData = await response.json();
+
+        // Převedeme data tak, aby to pasovalo do tvé připravené funkce renderKarta
+        const storeNames = { "1": "Steam", "7": "GOG", "11": "Humble", "25": "Epic" };
+
+        const hry = rawData.map(d => ({
+            title: d.title,
+            salePrice: parseFloat(d.salePrice),
+            normalPrice: parseFloat(d.normalPrice),
+            savings: parseFloat(d.savings),
+            storeName: storeNames[d.storeID] || "Jiný",
+            dealID: d.dealID,
+            thumb: d.thumb
+        }));
+
         vystup.innerHTML = "";
+
         if (!hry.length) {
-            vystup.innerHTML = "<p style='color:#a0a0b0; grid-column:1/-1;'>Žádné slevy k zobrazení.</p>";
+            vystup.innerHTML = `<p style='color:#a0a0b0; grid-column:1/-1;'>Žádné pořádné slevy pro tento obchod teď nejsou k dispozici.</p>`;
             return;
         }
+
+        // Vykreslení upravených kartiček
         hry.forEach(hra => renderKarta(hra, vystup));
-    } catch {
-        vystup.innerHTML = "<p style='color:#a0a0b0; grid-column:1/-1;'>Zadej název hry a klikni Hledat.</p>";
+
+    } catch (err) {
+        console.error("Chyba načítání:", err);
+        vystup.innerHTML = "<p style='color:#e57373; grid-column:1/-1;'>Nepodařilo se načíst slevy. Zkus to znovu.</p>";
     }
 }
 
@@ -169,27 +207,72 @@ async function pridatDoWatchlistu(nazev, cena) {
 // ── Našeptávání ───────────────────────────────────────────
 async function nacistNaseptavani(q) {
     try {
-        const response = await fetch(`/suggest?q=${encodeURIComponent(q)}`);
-        const names = await response.json();
-        zobrazitNaseptavac(names);
+        // Ptáme se API přímo na slevy (deals), abychom získali % slevy a ceny
+        const response = await fetch(`https://www.cheapshark.com/api/1.0/deals?title=${encodeURIComponent(q)}&pageSize=15`);
+        const vsechnyDeals = await response.json();
+
+        // Protože API může vrátit stejnou hru z více obchodů (Steam, Epic...),
+        // vyfiltrujeme si jen unikátní názvy. (API je řadí podle nejlepší slevy)
+        const unikatniHry = [];
+        const videne = new Set();
+
+        for (const deal of vsechnyDeals) {
+            const nazevMale = deal.title.toLowerCase();
+            if (!videne.has(nazevMale)) {
+                videne.add(nazevMale);
+                unikatniHry.push(deal);
+                if (unikatniHry.length === 6) break; // Omezíme na 6 výsledků
+            }
+        }
+
+        zobrazitNaseptavac(unikatniHry);
     } catch { skrytNaseptavac(); }
 }
 
-function zobrazitNaseptavac(names) {
+function zobrazitNaseptavac(hry) {
     let box = document.getElementById('naseptavac');
+
     if (!box) {
         box = document.createElement('div');
         box.id = 'naseptavac';
-        box.style.cssText = 'position:absolute; top:100%; left:0; right:0; background:#1a1d27; border:1px solid #2a2d3a; border-top:none; border-radius:0 0 8px 8px; z-index:100; overflow:hidden;';
+        box.style.cssText = 'position:absolute; top:100%; left:0; right:0; background:#1a1d27; border:1px solid #2a2d3a; border-top:none; border-radius:0 0 8px 8px; z-index:100; overflow:hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.6);';
         document.querySelector('.search-wrap').appendChild(box);
+
+        const style = document.createElement('style');
+        style.innerHTML = '.naseptavac-item:hover { background: #2a2d3a; }';
+        document.head.appendChild(style);
     }
-    if (!names.length) { skrytNaseptavac(); return; }
-    box.innerHTML = names.map(n => `
-        <div class="naseptavac-item" onclick="vybratNaseptavani('${n.replace(/'/g, "\\'")}')"
-             style="padding:0.6rem 1rem; cursor:pointer; font-size:0.9rem; border-bottom:1px solid #2a2d3a;">
-            ${n}
+
+    if (!hry || !hry.length) { skrytNaseptavac(); return; }
+
+    // Vykreslení položek
+    box.innerHTML = hry.map(hra => {
+        // Výpočet slevy a ceny
+        const sleva = Math.round(parseFloat(hra.savings));
+        const cenaCZK = Math.round(parseFloat(hra.salePrice) * KURZ);
+
+        // Vytvoření štítku (červený pro slevu, šedý pokud sleva není)
+        const badgeSleva = sleva > 0
+            ? `<span style="background:#e57373; color:#1a1d27; font-size:0.75rem; font-weight:bold; padding:2px 6px; border-radius:4px;">-${sleva}%</span>`
+            : `<span style="background:#2a2d3a; color:#a0a0b0; font-size:0.75rem; padding:2px 6px; border-radius:4px;">Bez slevy</span>`;
+
+        return `
+        <div class="naseptavac-item" onclick="vybratNaseptavani('${hra.title.replace(/'/g, "\\'")}')"
+             style="display:flex; align-items:center; justify-content:space-between; padding:0.6rem 1rem; cursor:pointer; border-bottom:1px solid #2a2d3a; transition:background 0.2s;">
+            
+            <div style="display:flex; align-items:center; gap:12px; overflow:hidden;">
+                <img src="${hra.thumb}" alt="thumb" style="width:46px; height:24px; object-fit:cover; border-radius:4px; opacity:0.9;">
+                <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:500; color:#e0e0e0; font-size:0.95rem;">${hra.title}</span>
+            </div>
+            
+            <div style="display:flex; align-items:center; gap:10px; flex-shrink:0;">
+                ${badgeSleva}
+                <span style="color:#00bcd4; font-weight:600; font-size:0.9rem; min-width:55px; text-align:right;">${cenaCZK} Kč</span>
+            </div>
         </div>
-    `).join('');
+        `;
+    }).join('');
+
     box.style.display = 'block';
 }
 

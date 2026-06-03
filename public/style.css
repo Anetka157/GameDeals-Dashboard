@@ -170,6 +170,29 @@ tbody tr:hover { background: #1e2130; }
 
 /* ── Responsive ── */
 @media (max-width: 600px) {
-  .navbar__links { display: none; }
-  .deals-grid { grid-template-columns: 1fr 1fr; }
+
+  .navbar {
+    height: auto;
+    flex-direction: column;
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .navbar__links {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    gap: 1.5rem;
+  }
+
+  .deals-grid {
+    grid-template-columns: 1fr;
+  }
+
+  form[onsubmit] {
+    flex-direction: column;
+  }
+  form[onsubmit] button {
+    width: 100%;
+  }
 }

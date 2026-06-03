@@ -23,36 +23,32 @@ document.addEventListener('DOMContentLoaded', async () => {
         hry.forEach(hra => {
             const cenaPridani = hra.target_price ? Math.round(hra.target_price * KURZ) + ' Kč' : '—';
 
-            let datum = '—';
-            if (hra.added_date) {
-                const d = new Date(hra.added_date);
-                if (!isNaN(d.getTime())) datum = d.toLocaleDateString('cs-CZ');
-            }
+            // Predpokladáme, že backend ti posiela aktuálnu cenu (hra.current_price alebo podobne)
+            // a normálnu cenu (hra.normal_price). Prispôsob názvy premenných podľa vášho backendu.
+            const uzNeniVeSleve = hra.current_price >= hra.normal_price;
 
-            const nazevEsc = hra.game_title.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+            // Vytvoríme CSS štýl pre preškrtnutie a zmenu farby na nevýraznú sivú
+            const stylPreSkrtnuti = uzNeniVeSleve ? 'style="text-decoration: line-through; color: #7a7a8a;"' : '';
 
-            seznam.innerHTML += `
-                <tr id="row-${hra.id}">
-                    <td>
-                        <span style="cursor:pointer; color:#e0e0e0; font-weight:500;"
-                              onclick="hledatAOtevrit('${nazevEsc}')"
-                              class="hra-link">
-                            ${hra.game_title}
-                        </span>
-                    </td>
-                    <td><span class="badge badge-steam">PC</span></td>
-                    <td style="color:#00bcd4;">${cenaPridani}</td>
-                    <td id="cena-${hra.id}" style="color:#a0a0b0;">⟳</td>
-                    <td style="color:#a0a0b0;">${datum}</td>
-                    <td>
-                        <button class="btn btn-outline"
-                                style="padding:3px 8px; font-size:0.75rem; color:#e57373; border-color:#e57373;"
-                                onclick="smazatZWatchlistu(${hra.id})">
-                            Odebrat
-                        </button>
-                    </td>
-                </tr>
-            `;
+            // Voliteľné: Môžeš pridať aj malý červený text "Akcia skončila"
+            const statusBadge = uzNeniVeSleve ? '<span style="color: #e57373; font-size: 0.75rem; margin-left: 8px; font-weight: normal; text-decoration: none !important; display: inline-block;">[Akcia skončila]</span>' : '';
+
+            let riadek = `
+      <tr>
+        <td ${stylPreSkrtnuti}>
+            <strong>${hra.game_title}</strong> ${statusBadge}
+        </td>
+        <td>${hra.store_name || 'Obchod'}</td>
+        <td>${cenaPridani}</td>
+        <td ${stylPreSkrtnuti}>${Math.round(hra.current_price * KURZ)} Kč</td>
+        <td>${datum}</td>
+        <td>
+          <button class="btn btn-outline" style="padding:4px 8px; font-size:0.75rem; border-color:#e57373; color:#e57373;" 
+                  onclick="smazatZWatchlistu(${hra.id})">✕</button>
+        </td>
+      </tr>
+    `;
+            seznam.innerHTML += riadek;
         });
 
         // Pak asynchronně dotáhni aktuální ceny
