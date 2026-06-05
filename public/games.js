@@ -298,15 +298,26 @@ async function otevritDetail(dealID, title, salePrice) {
         const response = await fetch(`/game-detail/${dealID}`);
         const data = await response.json();
 
+        // 1. Univerzální odkaz přes CheapShark redirect
+        const odkazNaObchod = `https://www.cheapshark.com/redirect?dealID=${dealID}`;
+
+        // SPOLEČNÝ STYL PRO TLAČÍTKO (Zelené, výrazné)
+        const stylTlacitka = `display:block; text-align:center; text-decoration:none; margin-top:1.25rem; width:100%; padding:10px 0; background:#2e7d32; color:white; font-weight:bold; border-radius:6px; transition: background 0.2s;`;
+
         if (data.error || !data.gameInfo) {
-            // Záložní zobrazení z dat co už máme
+            // Záložní zobrazení z dat co už máme (Zde opraven text i styl tlačítka!)
             const cenaCZK = Math.round(parseFloat(salePrice) * KURZ);
             modalBody.innerHTML = `
                 <h2 style="font-size:1.1rem; margin-bottom:1rem;">${title}</h2>
                 <p style="color:#a0a0b0; font-size:0.85rem; margin-bottom:1rem;">Detail není dostupný pro tuto hru.</p>
                 <p style="font-size:0.82rem; color:#a0a0b0; margin-bottom:0.25rem;">Cena</p>
                 <p style="font-size:1.4rem; font-weight:600; color:#00bcd4; margin-bottom:1.25rem;">${cenaCZK} Kč</p>
-                <button class="btn btn-primary" style="width:100%"
+                
+                <a href="${odkazNaObchod}" target="_blank" style="${stylTlacitka}">
+                    ➔ Přejít do obchodu
+                </a>
+
+                <button class="btn btn-primary" style="margin-top:0.5rem; width:100%"
                     onclick="pridatDoWatchlistu('${title.replace(/'/g, "\\'")}', ${salePrice})">
                     ♡ Přidat do watchlistu
                 </button>
@@ -342,7 +353,12 @@ async function otevritDetail(dealID, title, salePrice) {
                             </div>
                         `).join('')}
                     ` : ''}
-                    <button class="btn btn-primary" style="margin-top:1.25rem; width:100%;"
+                    
+                    <a href="${odkazNaObchod}" target="_blank" style="${stylTlacitka}">
+                        ➔ Přejít do obchodu
+                    </a>
+
+                    <button class="btn btn-primary" style="margin-top:0.5rem; width:100%;"
                         onclick="pridatDoWatchlistu('${title.replace(/'/g, "\\'")}', ${game.salePrice})">
                         ♡ Přidat do watchlistu
                     </button>
